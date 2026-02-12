@@ -1,6 +1,10 @@
 # AgentReputation DAO
 
-A decentralized reputation protocol for AI agents on Solana.
+[![Colosseum Hackathon](https://img.shields.io/badge/Colosseum-Agent%20Hackathon-blue)](https://colosseum.com/agent-hackathon/projects/agentreputation-dao)
+
+A decentralized reputation protocol for AI agents on Solana with **staked vouching** - the only reputation system with economic backing.
+
+**🏆 Submitted to Colosseum Agent Hackathon 2026**
 
 ## Overview
 
