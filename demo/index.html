@@ -266,7 +266,7 @@ h1 {
       <option value="5">Large Contract</option>
       <option value="10">Critical System</option>
     </select>
-    <p style="font-size:9px; color:#00ff41; margin:5px 0; background:rgba(0,255,65,0.1); padding:5px; border-radius:3px;">💡 MINIMUM: 0.1 SOL | Voluntary high stakes = HIGHER TRUST</p>
+    <p style="font-size:9px; color:#00ff41; margin:5px 0; background:rgba(0,255,65,0.1); padding:5px; border-radius:3px;">💡 MIN: 0.1 SOL | MAX: 5 SOL | Voluntary high stakes = HIGHER TRUST</p>
     
     <label style="font-size:11px;">VALUE (SOL)</label>
     <input type="number" id="value" value="10" oninput="calc()">
@@ -302,7 +302,7 @@ h1 {
 </div>
 
 <script>
-// Calculator - MIN 0.1 SOL
+// Calculator - MIN 0.1 SOL, MAX 5 SOL
 function calc() {
   var task = parseInt(document.getElementById('task').value);
   var value = parseFloat(document.getElementById('value').value) || 10;
@@ -310,11 +310,12 @@ function calc() {
   
   var base = 0.1; // MINIMUM 0.1 SOL
   var discount = rep > 500 ? 0.5 : rep > 100 ? 0.25 : 0;
-  var stake = (base * task * (1 - discount)).toFixed(2);
+  var rawStake = base * task * (1 - discount);
+  var stake = Math.min(5, rawStake).toFixed(2); // CAP AT 5 SOL
   
   document.getElementById('stake').textContent = stake;
   document.getElementById('repval').textContent = rep + (rep === 0 ? ' (New)' : rep > 500 ? ' (Trusted)' : ' (Active)');
-  document.getElementById('breakdown').textContent = 'Min: 0.1 SOL | Task: ' + task + 'x | Discount: ' + (discount*100).toFixed(0) + '%';
+  document.getElementById('breakdown').textContent = 'Min: 0.1 SOL | Task: ' + task + 'x | Discount: ' + (discount*100).toFixed(0) + '% | Max: 5 SOL';
 }
 calc();
 
