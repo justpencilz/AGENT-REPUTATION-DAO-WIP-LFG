@@ -261,12 +261,12 @@ h1 {
     
     <label style="font-size:11px;">TASK TYPE</label>
     <select id="task" onchange="calc()">
-      <option value="1">Small Task (1 SOL min)</option>
-      <option value="2">Medium Project (2-5 SOL)</option>
-      <option value="5">Large Contract (5-8 SOL)</option>
-      <option value="10">Critical System (10 SOL max)</option>
+      <option value="1">Small Task</option>
+      <option value="3">Medium Project</option>
+      <option value="5">Large Contract</option>
+      <option value="10">Critical System</option>
     </select>
-    <p style="font-size:9px; color:#ff0040; margin:5px 0;">⚠️ MIN: 1 SOL | MAX: 10 SOL</p>
+    <p style="font-size:9px; color:#00ff41; margin:5px 0; background:rgba(0,255,65,0.1); padding:5px; border-radius:3px;">💡 MINIMUM: 0.1 SOL | Voluntary high stakes = HIGHER TRUST</p>
     
     <label style="font-size:11px;">VALUE (SOL)</label>
     <input type="number" id="value" value="10" oninput="calc()">
@@ -302,23 +302,19 @@ h1 {
 </div>
 
 <script>
-// Calculator - MIN 1 SOL, MAX 10 SOL
+// Calculator - MIN 0.1 SOL
 function calc() {
   var task = parseInt(document.getElementById('task').value);
   var value = parseFloat(document.getElementById('value').value) || 10;
   var rep = parseInt(document.getElementById('rep').value);
   
-  // Base calculation
-  var base = 1.0; // MINIMUM 1 SOL
+  var base = 0.1; // MINIMUM 0.1 SOL
   var discount = rep > 500 ? 0.5 : rep > 100 ? 0.25 : 0;
-  var rawStake = base * task * (1 - discount);
-  
-  // CAP AT 10 SOL MAX
-  var stake = Math.min(10, Math.max(1, rawStake)).toFixed(2);
+  var stake = (base * task * (1 - discount)).toFixed(2);
   
   document.getElementById('stake').textContent = stake;
   document.getElementById('repval').textContent = rep + (rep === 0 ? ' (New)' : rep > 500 ? ' (Trusted)' : ' (Active)');
-  document.getElementById('breakdown').textContent = 'Min: 1 SOL | Task Multiplier: ' + task + 'x | Rep Discount: ' + (discount*100).toFixed(0) + '% | Max: 10 SOL';
+  document.getElementById('breakdown').textContent = 'Min: 0.1 SOL | Task: ' + task + 'x | Discount: ' + (discount*100).toFixed(0) + '%';
 }
 calc();
 
