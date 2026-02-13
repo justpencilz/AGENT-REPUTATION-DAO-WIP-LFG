@@ -155,11 +155,24 @@ h1 {
 }
 
 @keyframes glow {
-  0%, 100% { text-shadow: 0 0 20px #00ff41, 0 0 40px #00ff41; }
-  50% { text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41; }
+  0%, 100% { text-shadow: 0 0 20px #00ff41, 0 0 40px #00ff41, 0 0 60px #00ff41; }
+  50% { text-shadow: 0 0 30px #00ff41, 0 0 50px #00ff41, 0 0 70px #00ff41; }
 }
 
-h1 { animation: glow 2s infinite; }
+@keyframes titlePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+h1 { 
+  animation: glow 2s infinite, titlePulse 3s infinite;
+  background: linear-gradient(135deg, #fff 0%, #00ff41 50%, #00ccff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 32px;
+  letter-spacing: 2px;
+}
 
 .log-entry { margin: 3px 0; }
 .log-reg { color: #00ff41; }
@@ -172,11 +185,11 @@ h1 { animation: glow 2s infinite; }
 
 <!-- LEFT PANEL -->
 <div class="left-panel">
-  <div style="text-align:center; margin-bottom:30px; border:2px solid #00ff41; padding:20px; background:rgba(0,255,65,0.05);">
-    <div style="font-size:11px; color:#00ff41; margin-bottom:5px; letter-spacing:3px;">◆ COLOSSEUM AGENT HACKATHON 2026 ◆</div>
-    <h1 style="font-size:28px; margin:10px 0; text-shadow:0 0 20px #00ff41, 0 0 40px #00ff41;">AGENTREPUTATION DAO</h1>
-    <div style="font-size:14px; color:#00ff41; font-weight:bold; margin:10px 0;">⚡ THE FIRST REPUTATION PROTOCOL WITH ECONOMIC BACKING ⚡</div>
-    <div style="font-size:10px; color:#666; margin-top:10px;">Built 100% by autonomous AI • No human wrote code</div>
+  <div style="text-align:center; margin-bottom:30px; border:3px solid #00ff41; padding:25px 20px; background:linear-gradient(180deg, rgba(0,255,65,0.1) 0%, rgba(0,0,0,0.8) 100%); box-shadow:0 0 30px rgba(0,255,65,0.3);">
+    <div style="font-size:10px; color:#00ff41; margin-bottom:8px; letter-spacing:4px; font-weight:bold;">◆ COLOSSEUM AGENT HACKATHON 2026 ◆</div>
+    <h1 style="margin:15px 0; font-weight:900;">AGENT REPUTATION DAO</h1>
+    <div style="font-size:13px; color:#00ff41; font-weight:bold; margin:15px 0; letter-spacing:1px; text-shadow:0 0 10px #00ff41;">⚡ THE FIRST REPUTATION PROTOCOL WITH ECONOMIC BACKING ⚡</div>
+    <div style="font-size:9px; color:#666; margin-top:15px; letter-spacing:1px;">◆ BUILT 100% BY AUTONOMOUS AI AGENT ◆</div>
   </div>
   
   <div class="crisis-box">
