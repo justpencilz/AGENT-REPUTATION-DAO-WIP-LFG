@@ -295,28 +295,88 @@ function calc() {
 }
 calc();
 
-// Agents
-const agents = [
-  { name: "TradingBot_Alpha", rep: 850, staked: 45.5, status: "safe" },
-  { name: "DataOracle_42", rep: 720, staked: 32.0, status: "safe" },
-  { name: "NewAgent_2024", rep: 45, staked: 0.5, status: "warning" },
-  { name: "ScamBot_X", rep: -120, staked: 0, status: "danger" }
+// Live Agents with updating data
+const liveAgents = [
+  { name: "TradingBot_Alpha", rep: 850, staked: 45.5, vouchesIn: 156, vouchesOut: 23, status: "safe", lastUpdate: 0 },
+  { name: "DataOracle_42", rep: 720, staked: 32.0, vouchesIn: 89, vouchesOut: 45, status: "safe", lastUpdate: 0 },
+  { name: "NewAgent_2024", rep: 45, staked: 0.5, vouchesIn: 3, vouchesOut: 2, status: "warning", lastUpdate: 0 },
+  { name: "ScamBot_X", rep: -120, staked: 0, vouchesIn: 0, vouchesOut: 0, status: "danger", lastUpdate: 0 }
 ];
+
+function getStatusColor(rep) {
+  return rep > 500 ? '#00ff41' : rep > 0 ? '#ffaa00' : '#ff0040';
+}
+
+function getStatusText(status) {
+  return status === 'safe' ? '✅ VERIFIED' : status === 'warning' ? '⚠️ MONITORING' : '🚫 SUSPICIOUS';
+}
 
 function renderAgents() {
   const list = document.getElementById('agent-list');
-  list.innerHTML = agents.map(a => `
-    <div class="agent-card ${a.status === 'danger' ? 'suspicious' : ''}">
-      <strong>${a.name}</strong><br>
-      Rep: <span style="color:${a.rep > 500 ? '#00ff41' : a.rep > 0 ? '#ffaa00' : '#ff0040'}; font-size:16px;">${a.rep}</span><br>
-      Staked: ${a.staked} SOL<br>
-      <span style="color:${a.status === 'safe' ? '#00ff41' : a.status === 'warning' ? '#ffaa00' : '#ff0040'}; font-size:10px;">
-        ${a.status === 'safe' ? '✅ VERIFIED' : a.status === 'warning' ? '⚠️ MONITORING' : '🚫 SUSPICIOUS'}
+  list.innerHTML = liveAgents.map((a, i) => `
+    <div class="agent-card ${a.status === 'danger' ? 'suspicious' : ''}" id="agent-${i}">
+      <strong>${a.name}</strong>
+      <span style="float:right; font-size:10px; color:#666;">#${1000 + i}</span><br>
+      <div style="margin:8px 0;">
+        Rep: <span id="rep-${i}" style="color:${getStatusColor(a.rep)}; font-size:18px; font-weight:bold; text-shadow:0 0 10px ${getStatusColor(a.rep)};">${a.rep}</span>
+        <span id="rep-change-${i}" style="font-size:10px; margin-left:5px;"></span>
+      </div>
+      <div style="font-size:11px; margin:5px 0;">
+        💰 <span id="stake-${i}">${a.staked.toFixed(1)}</span> SOL staked | 
+        👍 <span id="vin-${i}">${a.vouchesIn}</span> in | 
+        👎 <span id="vout-${i}">${a.vouchesOut}</span> out
+      </div>
+      <span style="color:${getStatusColor(a.rep)}; font-size:10px; font-weight:bold;">
+        ${getStatusText(a.status)}
       </span>
     </div>
   `).join('');
 }
 renderAgents();
+
+// Live update simulation
+function updateAgents() {
+  liveAgents.forEach((agent, i) => {
+    // Random reputation change
+    const change = Math.random() > 0.7 ? Math.floor(Math.random() * 20 - 5) : 0;
+    if (change !== 0) {
+      agent.rep = Math.max(-200, Math.min(1000, agent.rep + change));
+      agent.lastUpdate = Date.now();
+      
+      const repEl = document.getElementById(`rep-${i}`);
+      const changeEl = document.getElementById(`rep-change-${i}`);
+      if (repEl && changeEl) {
+        repEl.textContent = agent.rep;
+        repEl.style.color = getStatusColor(agent.rep);
+        repEl.style.textShadow = `0 0 10px ${getStatusColor(agent.rep)}`;
+        
+        changeEl.textContent = change > 0 ? `+${change} ▲` : `${change} ▼`;
+        changeEl.style.color = change > 0 ? '#00ff41' : '#ff0040';
+        setTimeout(() => { changeEl.textContent = ''; }, 3000);
+      }
+    }
+    
+    // Random stake change
+    if (Math.random() > 0.8) {
+      const stakeChange = (Math.random() * 2 - 0.5).toFixed(1);
+      agent.staked = Math.max(0, agent.staked + parseFloat(stakeChange));
+      const stakeEl = document.getElementById(`stake-${i}`);
+      if (stakeEl) stakeEl.textContent = agent.staked.toFixed(1);
+    }
+    
+    // Random vouch count change
+    if (Math.random() > 0.85) {
+      if (Math.random() > 0.5) agent.vouchesIn++;
+      else agent.vouchesOut++;
+      const vinEl = document.getElementById(`vin-${i}`);
+      const voutEl = document.getElementById(`vout-${i}`);
+      if (vinEl) vinEl.textContent = agent.vouchesIn;
+      if (voutEl) voutEl.textContent = agent.vouchesOut;
+    }
+  });
+}
+
+setInterval(updateAgents, 1500); // Update every 1.5 seconds
 
 // Terminal Simulation
 const term = document.getElementById('terminal-content');
