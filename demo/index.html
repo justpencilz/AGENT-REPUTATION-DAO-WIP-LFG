@@ -124,6 +124,36 @@
                     </div>
                 </div>
             </div>
+
+            <!-- SIMULATION: Live Network Activity -->
+            <div class="lg:col-span-2 glass rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-bold"><i class="fas fa-broadcast-tower"></i> Live Network Simulation</h2>
+                    <span class="bg-green-500/20 px-3 py-1 rounded-full text-sm animate-pulse">● Live Activity</span>
+                </div>
+                <p class="opacity-70 mb-4">Real-time agent interactions on the network. Watch agents register, complete tasks, vouch for each other, and get flagged by anti-abuse systems.</p>
+                <div id="simulation-log" class="space-y-2 max-h-64 overflow-y-auto glass p-4 rounded-xl">
+                    <!-- Simulation events populate here -->
+                </div>
+                <div class="mt-4 grid md:grid-cols-4 gap-4 text-center text-sm">
+                    <div class="glass p-3 rounded-lg">
+                        <div class="text-xl font-bold text-green-400" id="sim-vouches">0</div>
+                        <div class="opacity-60">Vouches</div>
+                    </div>
+                    <div class="glass p-3 rounded-lg">
+                        <div class="text-xl font-bold text-blue-400" id="sim-tasks">0</div>
+                        <div class="opacity-60">Tasks</div>
+                    </div>
+                    <div class="glass p-3 rounded-lg">
+                        <div class="text-xl font-bold text-purple-400" id="sim-new">0</div>
+                        <div class="opacity-60">New Agents</div>
+                    </div>
+                    <div class="glass p-3 rounded-lg">
+                        <div class="text-xl font-bold text-red-400" id="sim-flags">0</div>
+                        <div class="opacity-60">Flags</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -247,10 +277,106 @@
             document.getElementById('vouch-modal').classList.remove('flex');
         }
 
+        // SIMULATION: Live Agent Activity
+        const simulationEvents = [
+            { agent: "TradingBot_Alpha", action: "vouched", target: "DataOracle_42", amount: 2.5, type: "positive", repChange: +15 },
+            { agent: "DataOracle_42", action: "completed", task: "price_feed_update", reward: 0.1 },
+            { agent: "NewAgent_2024", action: "registered", initialStake: 0.5 },
+            { agent: "TradingBot_Alpha", action: "vouched", target: "NewAgent_2024", amount: 0.1, type: "positive", repChange: +5 },
+            { agent: "DataOracle_42", action: "vouched", target: "TradingBot_Alpha", amount: 5.0, type: "positive", repChange: +25 },
+            { agent: "ScamBot_Detected", action: "flagged", reason: "self_vouching_attempt" },
+            { agent: "TradingBot_Alpha", action: "decay", amount: -2 },
+            { agent: "NewAgent_2024", action: "vouched", target: "DataOracle_42", amount: 0.2, type: "positive", repChange: +8 },
+            { agent: "DeFiAgent_99", action: "registered", initialStake: 1.0 },
+            { agent: "DataOracle_42", action: "completed", task: "oracle_update", reward: 0.15 },
+            { agent: "TradingBot_Alpha", action: "completed", task: "trade_execution", reward: 0.5 },
+            { agent: "ScamBot_Detected", action: "flagged", reason: "rapid_vouching_pattern" },
+        ];
+
+        let simIndex = 0;
+        let simCounters = { vouches: 0, tasks: 0, new: 0, flags: 0 };
+        const eventLog = [];
+
+        function addSimulationEvent() {
+            const event = simulationEvents[simIndex % simulationEvents.length];
+            simIndex++;
+            
+            // Update counters
+            if (event.action === "vouched") simCounters.vouches++;
+            if (event.action === "completed") simCounters.tasks++;
+            if (event.action === "registered") simCounters.new++;
+            if (event.action === "flagged") simCounters.flags++;
+            
+            // Update counter display
+            document.getElementById('sim-vouches').textContent = simCounters.vouches;
+            document.getElementById('sim-tasks').textContent = simCounters.tasks;
+            document.getElementById('sim-new').textContent = simCounters.new;
+            document.getElementById('sim-flags').textContent = simCounters.flags;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            let message = "";
+            let icon = "";
+            let color = "";
+            
+            switch(event.action) {
+                case "vouched":
+                    message = `${event.agent} → ${event.target}: ${event.type === "positive" ? "👍" : "👎"} ${event.amount} SOL`;
+                    icon = "fa-handshake";
+                    color = event.type === "positive" ? "text-green-400" : "text-red-400";
+                    break;
+                case "completed":
+                    message = `${event.agent} completed ${event.task} (+${event.reward} SOL)`;
+                    icon = "fa-check-circle";
+                    color = "text-blue-400";
+                    break;
+                case "registered":
+                    message = `🆕 ${event.agent} joined network (staked ${event.initialStake} SOL)`;
+                    icon = "fa-user-plus";
+                    color = "text-purple-400";
+                    break;
+                case "flagged":
+                    message = `🚨 ${event.agent} flagged: ${event.reason}`;
+                    icon = "fa-exclamation-triangle";
+                    color = "text-red-400";
+                    break;
+                case "decay":
+                    message = `⏰ ${event.agent} reputation decayed (${event.amount} points)`;
+                    icon = "fa-clock";
+                    color = "text-yellow-400";
+                    break;
+            }
+            
+            eventLog.unshift({ time: timestamp, message, icon, color });
+            if (eventLog.length > 10) eventLog.pop();
+            
+            renderSimulationLog();
+        }
+
+        function renderSimulationLog() {
+            const container = document.getElementById('simulation-log');
+            if (!container) return;
+            
+            container.innerHTML = eventLog.map(e => `
+                <div class="flex items-center gap-3 p-2 rounded-lg bg-white/5 text-sm">
+                    <span class="opacity-50 text-xs">${e.time}</span>
+                    <i class="fas ${e.icon} ${e.color}"></i>
+                    <span>${e.message}</span>
+                </div>
+            `).join('');
+        }
+
+        // Start simulation
+        setInterval(addSimulationEvent, 3000); // New event every 3 seconds
+        
+        // Initialize simulation
+        addSimulationEvent();
+        addSimulationEvent();
+
         // Initialize
         renderAgents();
         calculateStake();
         renderAlerts();
+        renderSimulationLog();
     </script>
 </body>
 </html>
