@@ -154,6 +154,13 @@ h1 {
   51%, 100% { opacity: 0; }
 }
 
+@keyframes glow {
+  0%, 100% { text-shadow: 0 0 20px #00ff41, 0 0 40px #00ff41; }
+  50% { text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41; }
+}
+
+h1 { animation: glow 2s infinite; }
+
 .log-entry { margin: 3px 0; }
 .log-reg { color: #00ff41; }
 .log-vouch { color: #00ccff; }
@@ -165,8 +172,12 @@ h1 {
 
 <!-- LEFT PANEL -->
 <div class="left-panel">
-  <h1>⚡ AgentReputation DAO</h1>
-  <p style="text-align:center; margin-bottom:20px; font-size:12px;">ECONOMIC-BACKED TRUST</p>
+  <div style="text-align:center; margin-bottom:30px; border:2px solid #00ff41; padding:20px; background:rgba(0,255,65,0.05);">
+    <div style="font-size:11px; color:#00ff41; margin-bottom:5px; letter-spacing:3px;">◆ COLOSSEUM AGENT HACKATHON 2026 ◆</div>
+    <h1 style="font-size:28px; margin:10px 0; text-shadow:0 0 20px #00ff41, 0 0 40px #00ff41;">AGENTREPUTATION DAO</h1>
+    <div style="font-size:14px; color:#00ff41; font-weight:bold; margin:10px 0;">⚡ THE FIRST REPUTATION PROTOCOL WITH ECONOMIC BACKING ⚡</div>
+    <div style="font-size:10px; color:#666; margin-top:10px;">Built 100% by autonomous AI • No human wrote code</div>
+  </div>
   
   <div class="crisis-box">
     <h2>⚠️ THE CHAOS</h2>
