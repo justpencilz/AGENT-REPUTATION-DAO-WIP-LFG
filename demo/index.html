@@ -309,12 +309,12 @@ h1 {
     <h3 style="color:#00ff41; margin-bottom:15px;">💰 STAKE CALCULATOR</h3>
     
     <label style="font-size:11px;">TASK TYPE</label>
-    <select id="task" onchange="calc()">
-      <option value="1">Small Task</option>
-      <option value="3">Medium Project</option>
-      <option value="5">Large Contract</option>
-      <option value="10">Critical System</option>
-    </select>
+    <div style="display:flex; flex-wrap:wrap; gap:5px; margin:8px 0;">
+      <button onclick="setTask(1)" id="btn-task-1" class="task-btn" style="flex:1; min-width:45%; padding:8px; font-size:10px; background:rgba(0,255,65,0.1); border:1px solid #00ff41; color:#00ff41; cursor:pointer;">Small Task</button>
+      <button onclick="setTask(3)" id="btn-task-3" class="task-btn" style="flex:1; min-width:45%; padding:8px; font-size:10px; background:rgba(0,255,65,0.1); border:1px solid #00ff41; color:#00ff41; cursor:pointer;">Medium Project</button>
+      <button onclick="setTask(5)" id="btn-task-5" class="task-btn" style="flex:1; min-width:45%; padding:8px; font-size:10px; background:rgba(0,255,65,0.1); border:1px solid #00ff41; color:#00ff41; cursor:pointer;">Large Contract</button>
+      <button onclick="setTask(10)" id="btn-task-10" class="task-btn" style="flex:1; min-width:45%; padding:8px; font-size:10px; background:rgba(0,255,65,0.1); border:1px solid #00ff41; color:#00ff41; cursor:pointer;">Critical System</button>
+    </div>
     <p style="font-size:9px; color:#00ff41; margin:5px 0; background:rgba(0,255,65,0.1); padding:5px; border-radius:3px;">💡 MIN: 0.1 SOL | MAX: 5 SOL | Voluntary high stakes = HIGHER TRUST</p>
     
     <label style="font-size:11px;">VALUE (SOL)</label>
@@ -351,22 +351,45 @@ h1 {
 </div>
 
 <script>
+var currentTask = 1;
+
+function setTask(val) {
+  currentTask = val;
+  // Update button styles
+  [1, 3, 5, 10].forEach(t => {
+    const btn = document.getElementById('btn-task-' + t);
+    if (btn) {
+      if (t === val) {
+        btn.style.background = '#00ff41';
+        btn.style.color = '#000';
+        btn.style.fontWeight = 'bold';
+      } else {
+        btn.style.background = 'rgba(0,255,65,0.1)';
+        btn.style.color = '#00ff41';
+        btn.style.fontWeight = 'normal';
+      }
+    }
+  });
+  calc();
+}
+
 // Calculator - MIN 0.1 SOL, MAX 5 SOL
 function calc() {
-  var task = parseInt(document.getElementById('task').value);
   var value = parseFloat(document.getElementById('value').value) || 10;
   var rep = parseInt(document.getElementById('rep').value);
   
   var base = 0.1; // MINIMUM 0.1 SOL
   var discount = rep > 500 ? 0.5 : rep > 100 ? 0.25 : 0;
-  var rawStake = base * task * (1 - discount);
+  var rawStake = base * currentTask * (1 - discount);
   var stake = Math.min(5, rawStake).toFixed(2); // CAP AT 5 SOL
   
   document.getElementById('stake').textContent = stake;
   document.getElementById('repval').textContent = rep + (rep === 0 ? ' (New)' : rep > 500 ? ' (Trusted)' : ' (Active)');
-  document.getElementById('breakdown').textContent = 'Min: 0.1 SOL | Task: ' + task + 'x | Discount: ' + (discount*100).toFixed(0) + '% | Max: 5 SOL';
+  document.getElementById('breakdown').textContent = 'Min: 0.1 SOL | Task: ' + currentTask + 'x | Discount: ' + (discount*100).toFixed(0) + '% | Max: 5 SOL';
 }
-calc();
+
+// Initialize with first button selected
+setTask(1);
 
 // Live Agents with updating data
 const liveAgents = [
