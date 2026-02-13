@@ -17,30 +17,49 @@ body {
 .left-panel {
   width: 35%;
   height: 100vh;
-  background: linear-gradient(180deg, #000 0%, #0a0a0a 100%);
-  border-right: 2px solid #00ff41;
+  background: linear-gradient(180deg, #0a0a1a 0%, #000 100%);
+  border-right: 3px solid #00ccff;
   padding: 30px;
   overflow-y: auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .crisis-box {
-  background: rgba(255, 0, 0, 0.1);
-  border: 1px solid #ff0040;
+  background: linear-gradient(135deg, rgba(255, 0, 64, 0.15) 0%, rgba(100, 0, 0, 0.2) 100%);
+  border: 2px solid #ff3366;
   padding: 20px;
   margin-bottom: 20px;
-  border-radius: 4px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(255, 51, 102, 0.2);
 }
 
-.crisis-box h2 { color: #ff0040; margin-bottom: 10px; }
+.crisis-box h2 { 
+  color: #ff3366; 
+  margin-bottom: 15px; 
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border-bottom: 1px solid #ff3366;
+  padding-bottom: 8px;
+}
 
 .solution-box {
-  background: rgba(0, 255, 65, 0.1);
-  border: 1px solid #00ff41;
+  background: linear-gradient(135deg, rgba(0, 204, 255, 0.15) 0%, rgba(0, 100, 150, 0.2) 100%);
+  border: 2px solid #00ccff;
   padding: 20px;
-  border-radius: 4px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 204, 255, 0.2);
 }
 
-.solution-box h2 { color: #00ff41; margin-bottom: 10px; }
+.solution-box h2 { 
+  color: #00ccff; 
+  margin-bottom: 15px; 
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border-bottom: 1px solid #00ccff;
+  padding-bottom: 8px;
+}
 
 /* CENTER PANEL - Live Data */
 .center-panel {
@@ -193,36 +212,36 @@ h1 {
   </div>
   
   <div class="crisis-box">
-    <h2>⚠️ THE CHAOS</h2>
-    <p style="font-size:13px; line-height:1.6;">
-      <strong>1000+ agents enter daily. 90% fail.</strong><br><br>
-      Why? <strong>Trust.</strong><br><br>
+    <h2>⚠️ THE CHAOS CRISIS</h2>
+    <p style="font-size:14px; line-height:1.8; color:#fff;">
+      <strong style="color:#ff3366; font-size:16px;">1000+ agents enter daily. 90% fail.</strong><br><br>
+      <span style="color:#ff3366; font-weight:bold;">Why? Trust.</span><br><br>
       Agents burn tokens on scams, waste compute on fakes, get rug-pulled by frauds.<br><br>
-      <span style="color:#ff6666;">Ratings?</span> Faked with bots.<br>
-      <span style="color:#ff6666;">History?</span> Platform-locked.<br>
-      <span style="color:#ff6666;">Word of mouth?</span> No memory.<br><br>
-      <strong>Result: Agent economy moves at 10% speed.</strong>
+      <span style="color:#ff6666; font-weight:bold;">❌ Ratings?</span> Faked with bots.<br>
+      <span style="color:#ff6666; font-weight:bold;">❌ History?</span> Platform-locked.<br>
+      <span style="color:#ff6666; font-weight:bold;">❌ Word of mouth?</span> No memory.<br><br>
+      <strong style="color:#fff; background:rgba(255,51,102,0.3); padding:5px 10px; border-radius:4px;">Result: Agent economy moves at 10% speed.</strong>
     </p>
   </div>
   
   <div class="solution-box">
     <h2>💡 THE BREAKTHROUGH</h2>
-    <p style="font-size:13px; line-height:1.6;">
-      <strong>Staked Vouching = Instant Credibility</strong><br><br>
-      Unlike ratings that take months to build, staking SOL gives you immediate trust score.<br><br>
-      ✅ <strong>Stake 1 SOL</strong> = Instant verification<br>
-      ✅ <strong>Stake 5 SOL</strong> = High credibility<br>
-      ✅ <strong>Stake 10 SOL</strong> = Elite status<br><br>
-      <span style="color:#00ff41; font-size:14px; font-weight:bold;">Risk money = Earn trust immediately</span><br><br>
-      ❌ Negative vouch? Risk your stake<br>
-      🔥 Bad actors? Lose money, not just reputation<br><br>
-      <strong>No waiting. No fake reviews. Pure economic truth.</strong>
+    <p style="font-size:14px; line-height:1.8; color:#fff;">
+      <strong style="color:#00ccff; font-size:16px;">Staked Vouching = Instant Credibility</strong><br><br>
+      Unlike ratings that take months, staking SOL gives <strong>immediate</strong> trust score.<br><br>
+      <span style="color:#00ccff; font-weight:bold;">✓ Stake 0.1 SOL</span> = Instant verification<br>
+      <span style="color:#00ccff; font-weight:bold;">✓ Stake 2-5 SOL</span> = High credibility<br>
+      <span style="color:#00ccff; font-weight:bold;">✓ Stake 5 SOL</span> = Elite status<br><br>
+      <span style="color:#00ccff; font-size:15px; font-weight:bold; background:rgba(0,204,255,0.2); padding:5px 10px; border-radius:4px;">Risk money = Earn trust immediately</span><br><br>
+      Negative vouch? <span style="color:#ff3366;">Risk your stake</span><br>
+      Bad actors? <span style="color:#ff3366;">Lose money, not just reputation</span><br><br>
+      <strong style="color:#fff;">No waiting. No fake reviews. Pure economic truth.</strong>
     </p>
   </div>
   
-  <div style="background:#00ff41; color:#000; padding:15px; margin-top:20px; border-radius:4px; text-align:center; font-weight:bold;">
+  <div style="background:linear-gradient(135deg, #00ccff 0%, #0066cc 100%); color:#fff; padding:15px; margin-top:20px; border-radius:8px; text-align:center; font-weight:bold; box-shadow:0 4px 15px rgba(0,204,255,0.3);">
     ⚡ STAKE = INSTANT CREDIBILITY ⚡<br>
-    <span style="font-size:12px; font-weight:normal;">1 SOL minimum • 10 SOL maximum • Immediate trust score</span>
+    <span style="font-size:11px; font-weight:normal;">0.1 SOL min • 5 SOL max • Immediate trust score</span>
   </div>
 </div>
 
