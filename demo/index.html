@@ -226,29 +226,29 @@ h1 {
 <!-- CENTER PANEL -->
 <div class="center-panel">
   <!-- STATS ROW -->
-  <div class="stats-grid" style="margin:8px 0; flex-shrink:0;">
-    <div class="stat-box" style="padding:8px;">
-      <div class="stat-number" style="font-size:22px;">4</div>
-      <div style="font-size:10px; color:#636363;">AGENTS</div>
+  <div class="stats-grid" style="margin:5px 0; flex-shrink:0;">
+    <div class="stat-box" style="padding:5px;">
+      <div class="stat-number" style="font-size:18px;">4</div>
+      <div style="font-size:9px; color:#636363;">AGENTS</div>
     </div>
-    <div class="stat-box" style="padding:8px;">
-      <div class="stat-number" style="font-size:22px;">78</div>
-      <div style="font-size:10px; color:#636363;">SOL</div>
+    <div class="stat-box" style="padding:5px;">
+      <div class="stat-number" style="font-size:18px;">78</div>
+      <div style="font-size:9px; color:#636363;">SOL</div>
     </div>
-    <div class="stat-box" style="padding:8px;">
-      <div class="stat-number" style="font-size:22px;">156</div>
-      <div style="font-size:10px; color:#636363;">VOUCHES</div>
+    <div class="stat-box" style="padding:5px;">
+      <div class="stat-number" style="font-size:18px;">156</div>
+      <div style="font-size:9px; color:#636363;">VOUCHES</div>
     </div>
   </div>
   
   <!-- AGENT REGISTRY -->
-  <h2 style="margin:8px 0 5px; color:#58C88D; font-size:13px; flex-shrink:0;">📊 LIVE AGENT REGISTRY</h2>
-  <div id="agent-list" style="flex:1; overflow:hidden;"></div>
+  <h2 style="margin:5px 0 3px; color:#58C88D; font-size:12px; flex-shrink:0;">📊 LIVE AGENT REGISTRY</h2>
+  <div id="agent-list" style="flex:0 0 auto;"></div>
   
   <!-- TERMINAL -->
-  <div class="terminal" style="height:100px; flex-shrink:0; margin-top:8px;">
-    <div class="terminal-header" style="font-size:11px; padding:4px 10px;">🖥️ NETWORK MONITOR <span class="blink">●</span></div>
-    <div id="terminal-content" style="font-size:11px; line-height:1.4;">
+  <div class="terminal" style="height:80px; flex-shrink:0; margin-top:5px;">
+    <div class="terminal-header" style="font-size:10px; padding:3px 8px;">🖥️ NETWORK MONITOR <span class="blink">●</span></div>
+    <div id="terminal-content" style="font-size:10px; line-height:1.3;">
       <div style="color:#636363;">$ ./monitor --live</div>
     </div>
   </div>
@@ -535,30 +535,30 @@ function getStatusText(status) {
 function renderAgents() {
   const list = document.getElementById('agent-list');
   list.innerHTML = liveAgents.map((a, i) => `
-    <div class="agent-card ${a.status === 'danger' ? 'suspicious' : ''}" id="agent-${i}" style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; margin:4px 0; background:rgba(0,255,65,0.08); border-left:3px solid ${getStatusColor(a.rep)}; border-radius:0 4px 4px 0;">
+    <div class="agent-card ${a.status === 'danger' ? 'suspicious' : ''}" id="agent-${i}" style="display:flex; justify-content:space-between; align-items:center; padding:5px 8px; margin:2px 0; background:rgba(88,200,141,0.08); border-left:3px solid ${getStatusColor(a.rep)}; border-radius:0 4px 4px 0; height:42px;">
       
       <!-- LEFT: Agent Identity -->
       <div style="flex:1; min-width:0;">
-        <div style="display:flex; align-items:center; gap:6px;">
-          <div style="width:10px; height:10px; background:${getStatusColor(a.rep)}; border-radius:50%; flex-shrink:0;"></div>
-          <strong style="font-size:12px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${a.name}</strong>
+        <div style="display:flex; align-items:center; gap:5px;">
+          <div style="width:8px; height:8px; background:${getStatusColor(a.rep)}; border-radius:50%; flex-shrink:0;"></div>
+          <strong style="font-size:11px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${a.name}</strong>
         </div>
-        <div style="font-size:9px; color:#636363; font-family:'Courier New',monospace; margin-top:3px;">${a.address}</div>
+        <div style="font-size:8px; color:#636363; font-family:'Courier New',monospace; margin-top:1px;">${a.address}</div>
       </div>
       
       <!-- RIGHT: Compact Stats -->
-      <div style="display:flex; gap:10px; text-align:center; margin-left:10px;">
-        <div style="min-width:40px;">
-          <div style="font-size:14px; font-weight:bold; color:${getStatusColor(a.rep)};" id="rep-${i}">${a.rep}</div>
-          <div style="font-size:8px; color:#636363;">REP</div>
-        </div>
-        <div style="min-width:40px;">
-          <div style="font-size:14px; font-weight:bold; color:#00ccff;" id="stake-${i}">${a.staked.toFixed(1)}</div>
-          <div style="font-size:8px; color:#636363;">SOL</div>
+      <div style="display:flex; gap:8px; text-align:center; margin-left:8px;">
+        <div style="min-width:35px;">
+          <div style="font-size:13px; font-weight:bold; color:${getStatusColor(a.rep)};" id="rep-${i}">${a.rep}</div>
+          <div style="font-size:7px; color:#636363;">REP</div>
         </div>
         <div style="min-width:35px;">
-          <div style="font-size:14px; font-weight:bold; color:#58C88D;" id="vin-${i}">${a.vouchesIn}</div>
-          <div style="font-size:8px; color:#636363;">IN</div>
+          <div style="font-size:13px; font-weight:bold; color:#00ccff;" id="stake-${i}">${a.staked.toFixed(1)}</div>
+          <div style="font-size:7px; color:#636363;">SOL</div>
+        </div>
+        <div style="min-width:30px;">
+          <div style="font-size:13px; font-weight:bold; color:#58C88D;" id="vin-${i}">${a.vouchesIn}</div>
+          <div style="font-size:7px; color:#636363;">IN</div>
         </div>
       </div>
       
