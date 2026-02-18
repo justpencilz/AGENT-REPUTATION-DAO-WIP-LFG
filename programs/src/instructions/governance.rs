@@ -32,7 +32,6 @@ pub enum ProposalType {
 }
 
 #[derive(Accounts)]
-#[instruction(proposal_type: ProposalType, new_value: u64, description: String)]
 pub struct CreateProposal<'info> {
     #[account(mut)]
     pub proposer: Signer<'info>,
@@ -69,8 +68,11 @@ pub fn create_proposal(
     ctx: Context<CreateProposal>,
     proposal_type: ProposalType,
     new_value: u64,
-    description: String,
+    description: [u8; 200],
+    desc_len: u8,
 ) -> Result<()> {
+    require!(desc_len <= 200, ReputationError::DescriptionTooLong);
+    
     let proposer_profile = &ctx.accounts.proposer_profile;
     
     // Require minimum reputation to propose (prevents spam)
@@ -78,20 +80,14 @@ pub fn create_proposal(
         proposer_profile.reputation_score >= 1000,
         ReputationError::InsufficientReputation
     );
-    require!(description.len() <= 200, ReputationError::DescriptionTooLong);
     
     let clock = Clock::get()?;
     let proposal = &mut ctx.accounts.proposal;
     
-    // Convert String to fixed-size byte array
-    let mut desc_bytes = [0u8; 200];
-    let bytes = description.as_bytes();
-    desc_bytes[..bytes.len()].copy_from_slice(bytes);
-    
     proposal.proposer = ctx.accounts.proposer.key();
     proposal.proposal_type = proposal_type;
     proposal.new_value = new_value;
-    proposal.description = desc_bytes;
+    proposal.description = description;
     proposal.votes_for = 0;
     proposal.votes_against = 0;
     proposal.voting_ends_at = clock.unix_timestamp + 86400 * 3; // 3 day voting period

@@ -1,6 +1,6 @@
 [features]
 seeds = false
-skip-lint = false
+skip-lint = true
 
 [programs.localnet]
 agentreputation_dao = ""

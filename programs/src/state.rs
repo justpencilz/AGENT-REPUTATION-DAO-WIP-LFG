@@ -21,7 +21,7 @@ impl ProtocolConfig {
 #[account]
 pub struct AgentProfile {
     pub owner: Pubkey,
-    pub name: String, // max 50 chars
+    pub name: [u8; 50], // fixed size for Anchor
     pub reputation_score: u64,
     pub total_tasks_completed: u64,
     pub last_activity_timestamp: i64,
@@ -33,7 +33,7 @@ pub struct AgentProfile {
 }
 
 impl AgentProfile {
-    pub const LEN: usize = 8 + 32 + (4 + 50) + 8 + 8 + 8 + 1 + 8 + 8 + 8 + 1;
+    pub const LEN: usize = 8 + 32 + 50 + 8 + 8 + 8 + 1 + 8 + 8 + 8 + 1;
 }
 
 /// Vouch record - PDA seeded by [vouch, voucher, vouched_for]
@@ -55,14 +55,14 @@ impl VouchRecord {
 #[account]
 pub struct TaskRecord {
     pub agent: Pubkey,
-    pub task_id: String, // max 100 chars
+    pub task_id: [u8; 100], // fixed size for Anchor
     pub reputation_earned: u64,
     pub completed_at: i64,
     pub bump: u8,
 }
 
 impl TaskRecord {
-    pub const LEN: usize = 8 + 32 + (4 + 100) + 8 + 8 + 1;
+    pub const LEN: usize = 8 + 32 + 100 + 8 + 8 + 1;
 }
 
 /// Reputation calculation helpers

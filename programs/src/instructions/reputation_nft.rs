@@ -100,9 +100,10 @@ pub struct MintReputationNFT<'info> {
 
 pub fn mint_reputation_nft(
     ctx: Context<MintReputationNFT>,
-    metadata_uri: String,
+    metadata_uri: [u8; 100],
+    uri_len: u8,
 ) -> Result<()> {
-    require!(metadata_uri.len() <= 100, crate::errors::ReputationError::DescriptionTooLong);
+    require!(uri_len <= 100, crate::errors::ReputationError::DescriptionTooLong);
     
     let agent = ctx.accounts.agent.key();
     let agent_profile = &ctx.accounts.agent_profile;
@@ -111,18 +112,13 @@ pub fn mint_reputation_nft(
     // Determine level based on current reputation
     let level = ReputationLevel::from_score(agent_profile.reputation_score);
     
-    // Convert String to fixed-size array
-    let mut uri_bytes = [0u8; 100];
-    let uri_slice = metadata_uri.as_bytes();
-    uri_bytes[..uri_slice.len()].copy_from_slice(uri_slice);
-    
     // Create NFT account
     let nft = &mut ctx.accounts.reputation_nft;
     nft.agent = agent;
     nft.level = level.clone();
     nft.score_at_mint = agent_profile.reputation_score;
     nft.minted_at = clock.unix_timestamp;
-    nft.metadata_uri = uri_bytes;
+    nft.metadata_uri = metadata_uri;
     nft.bump = ctx.bumps.reputation_nft;
     
     // Mint the NFT (soulbound - non-transferable)

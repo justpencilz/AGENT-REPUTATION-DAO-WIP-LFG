@@ -21,17 +21,18 @@ pub mod agentreputation_dao {
     }
 
     /// Register a new agent in the reputation system
-    pub fn register_agent(ctx: Context<RegisterAgent>, agent_name: String) -> Result<()> {
-        instructions::register_agent(ctx, agent_name)
+    pub fn register_agent(ctx: Context<RegisterAgent>, agent_name_bytes: [u8; 50], name_len: u8) -> Result<()> {
+        instructions::register_agent(ctx, agent_name_bytes, name_len)
     }
 
     /// Complete a task and earn reputation
     pub fn complete_task(
         ctx: Context<CompleteTask>,
-        task_id: String,
+        task_id: [u8; 100],
+        task_id_len: u8,
         reputation_amount: u64,
     ) -> Result<()> {
-        instructions::complete_task(ctx, task_id, reputation_amount)
+        instructions::complete_task(ctx, task_id, task_id_len, reputation_amount)
     }
 
     /// Vouch for another agent (stake tokens)
@@ -71,9 +72,10 @@ pub mod agentreputation_dao {
     /// Propagate trust through the network (EigenTrust algorithm)
     pub fn propagate_trust(
         ctx: Context<PropagateTrust>,
-        incoming_vouches: Vec<(Pubkey, u64, u64)>,
+        incoming_vouches: [instructions::weighted_vouch::VouchData; 10],
+        vouch_count: u8,
     ) -> Result<()> {
-        instructions::propagate_trust(ctx, incoming_vouches)
+        instructions::propagate_trust(ctx, incoming_vouches, vouch_count)
     }
 
     /// Create governance proposal
@@ -81,9 +83,10 @@ pub mod agentreputation_dao {
         ctx: Context<CreateProposal>,
         proposal_type: ProposalType,
         new_value: u64,
-        description: String,
+        description: [u8; 200],
+        desc_len: u8,
     ) -> Result<()> {
-        instructions::create_proposal(ctx, proposal_type, new_value, description)
+        instructions::create_proposal(ctx, proposal_type, new_value, description, desc_len)
     }
 
     /// Vote on governance proposal
@@ -122,9 +125,10 @@ pub mod agentreputation_dao {
     // Reputation NFT functions
     pub fn mint_reputation_nft(
         ctx: Context<MintReputationNFT>,
-        metadata_uri: String,
+        metadata_uri: [u8; 100],
+        uri_len: u8,
     ) -> Result<()> {
-        instructions::mint_reputation_nft(ctx, metadata_uri)
+        instructions::mint_reputation_nft(ctx, metadata_uri, uri_len)
     }
 
     pub fn upgrade_reputation_nft(ctx: Context<UpgradeReputationNFT>) -> Result<()> {
@@ -139,18 +143,21 @@ pub mod agentreputation_dao {
     pub fn initialize_zk_registry(
         ctx: Context<InitializeZKRegistry>,
         circuit_hash: [u8; 32],
-        verification_key: Vec<u8>,
+        verification_key: [u8; 1000],
+        vk_len: u16,
     ) -> Result<()> {
-        instructions::initialize_zk_registry(ctx, circuit_hash, verification_key)
+        instructions::initialize_zk_registry(ctx, circuit_hash, verification_key, vk_len)
     }
 
     pub fn submit_zk_proof(
         ctx: Context<SubmitZKProof>,
         statement: ZKStatement,
-        proof: Vec<u8>,
-        public_inputs: Vec<u64>,
+        proof: [u8; 500],
+        proof_len: u16,
+        public_inputs: [u64; 10],
+        input_count: u8,
     ) -> Result<bool> {
-        instructions::submit_zk_proof(ctx, statement, proof, public_inputs)
+        instructions::submit_zk_proof(ctx, statement, proof, proof_len, public_inputs, input_count)
     }
 
     pub fn verify_zk_proof(ctx: Context<VerifyZKProof>) -> Result<(ZKStatement, bool)> {

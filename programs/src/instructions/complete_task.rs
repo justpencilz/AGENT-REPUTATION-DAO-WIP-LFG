@@ -4,7 +4,6 @@ use crate::state::{AgentProfile, TaskRecord, ProtocolConfig};
 use crate::errors::ReputationError;
 
 #[derive(Accounts)]
-#[instruction(task_id: String, reputation_amount: u64)]
 pub struct CompleteTask<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
@@ -20,7 +19,7 @@ pub struct CompleteTask<'info> {
         init,
         payer = authority,
         space = TaskRecord::LEN,
-        seeds = [b"task", task_id.as_bytes(), authority.key().as_ref()],
+        seeds = [b"task", &task_id[..task_id_len as usize], authority.key().as_ref()],
         bump
     )]
     pub task_record: Account<'info, TaskRecord>,
@@ -57,10 +56,11 @@ pub struct CompleteTask<'info> {
 
 pub fn complete_task(
     ctx: Context<CompleteTask>,
-    task_id: String,
+    task_id: [u8; 100],
+    task_id_len: u8,
     reputation_amount: u64,
 ) -> Result<()> {
-    require!(task_id.len() <= 100, ReputationError::TaskIdTooLong);
+    require!(task_id_len <= 100, ReputationError::TaskIdTooLong);
     require!(reputation_amount > 0, ReputationError::InvalidReputationAmount);
     
     let profile = &mut ctx.accounts.agent_profile;
@@ -76,7 +76,7 @@ pub fn complete_task(
     // Create task record
     let task = &mut ctx.accounts.task_record;
     task.agent = ctx.accounts.authority.key();
-    task.task_id = task_id.clone();
+    task.task_id = task_id;
     task.reputation_earned = reputation_amount;
     task.completed_at = clock.unix_timestamp;
     task.bump = ctx.bumps.task_record;

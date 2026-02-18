@@ -8,7 +8,8 @@ use crate::state::AgentProfile;
 pub struct ZKVerificationKey {
     pub authority: Pubkey,
     pub circuit_hash: [u8; 32],
-    pub verification_key: Vec<u8>, // Groth16 or PLONK verification key
+    pub verification_key: [u8; 1000], // Fixed-size Groth16 or PLONK verification key
+    pub vk_len: u16, // Actual length of VK used
     pub bump: u8,
 }
 
@@ -43,7 +44,7 @@ pub struct InitializeZKRegistry<'info> {
     #[account(
         init,
         payer = authority,
-        space = 8 + 32 + 32 + (4 + 1000) + 1, // Variable size for VK
+        space = 8 + 32 + 32 + 1000 + 2 + 1, // Fixed size for VK
         seeds = [b"zk_registry"],
         bump
     )]
@@ -55,12 +56,16 @@ pub struct InitializeZKRegistry<'info> {
 pub fn initialize_zk_registry(
     ctx: Context<InitializeZKRegistry>,
     circuit_hash: [u8; 32],
-    verification_key: Vec<u8>,
+    verification_key: [u8; 1000],
+    vk_len: u16,
 ) -> Result<()> {
+    require!(vk_len <= 1000, crate::errors::ReputationError::InvalidParameter);
+    
     let registry = &mut ctx.accounts.zk_registry;
     registry.authority = ctx.accounts.authority.key();
     registry.circuit_hash = circuit_hash;
     registry.verification_key = verification_key;
+    registry.vk_len = vk_len;
     registry.bump = ctx.bumps.zk_registry;
     
     msg!("ZK registry initialized with circuit: {:?}", circuit_hash);
@@ -68,7 +73,7 @@ pub fn initialize_zk_registry(
 }
 
 #[derive(Accounts)]
-#[instruction(statement: ZKStatement, proof: Vec<u8>, public_inputs: Vec<u64>)]
+#[instruction(statement: ZKStatement, proof: [u8; 500], proof_len: u16, public_inputs: [u64; 10], input_count: u8)]
 pub struct SubmitZKProof<'info> {
     #[account(mut)]
     pub prover: Signer<'info>,
@@ -104,9 +109,13 @@ pub struct SubmitZKProof<'info> {
 pub fn submit_zk_proof(
     ctx: Context<SubmitZKProof>,
     statement: ZKStatement,
-    proof: Vec<u8>,
-    public_inputs: Vec<u64>,
+    proof: [u8; 500],
+    proof_len: u16,
+    public_inputs: [u64; 10],
+    input_count: u8,
 ) -> Result<bool> {
+    require!(proof_len <= 500, crate::errors::ReputationError::InvalidParameter);
+    require!(input_count <= 10, crate::errors::ReputationError::InvalidParameter);
     let prover = ctx.accounts.prover.key();
     let prover_profile = &ctx.accounts.prover_profile;
     let registry = &ctx.accounts.zk_registry;
@@ -117,10 +126,12 @@ pub fn submit_zk_proof(
     // 3. Verify without revealing private reputation score
     
     // For now, simulate verification based on actual reputation
+    // Convert fixed array to slice for processing
+    let inputs_slice: &[u64] = &public_inputs[..input_count as usize];
     let verified = simulate_zk_verification(
         &statement,
         prover_profile.reputation_score,
-        &public_inputs,
+        inputs_slice,
     );
     
     let clock = Clock::get()?;

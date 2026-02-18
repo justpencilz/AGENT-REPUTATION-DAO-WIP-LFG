@@ -3,7 +3,6 @@ use crate::state::AgentProfile;
 use crate::errors::ReputationError;
 
 #[derive(Accounts)]
-#[instruction(agent_name: String)]
 pub struct RegisterAgent<'info> {
     #[account(mut)]
     pub owner: Signer<'info>,
@@ -20,14 +19,14 @@ pub struct RegisterAgent<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn register_agent(ctx: Context<RegisterAgent>, agent_name: String) -> Result<()> {
-    require!(agent_name.len() <= 50, ReputationError::NameTooLong);
+pub fn register_agent(ctx: Context<RegisterAgent>, agent_name_bytes: [u8; 50], name_len: u8) -> Result<()> {
+    require!(name_len <= 50, ReputationError::NameTooLong);
     
     let profile = &mut ctx.accounts.agent_profile;
     let clock = Clock::get()?;
     
     profile.owner = ctx.accounts.owner.key();
-    profile.name = agent_name;
+    profile.name = agent_name_bytes;
     profile.reputation_score = 0;
     profile.total_tasks_completed = 0;
     profile.last_activity_timestamp = clock.unix_timestamp;
@@ -37,6 +36,6 @@ pub fn register_agent(ctx: Context<RegisterAgent>, agent_name: String) -> Result
     profile.staked_amount = 0;
     profile.bump = ctx.bumps.agent_profile;
     
-    msg!("Agent registered: {}", profile.name);
+    msg!("Agent registered");
     Ok(())
 }

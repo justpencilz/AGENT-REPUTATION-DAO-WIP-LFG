@@ -8,12 +8,13 @@ use crate::errors::ReputationError;
 #[account]
 pub struct OracleRegistry {
     pub authority: Pubkey,
-    pub authorized_oracles: Vec<Pubkey>, // Max 10 oracles
+    pub authorized_oracles: [Pubkey; 10], // Fixed 10 slots
+    pub oracle_count: u8, // Track how many are actually used
     pub bump: u8,
 }
 
 impl OracleRegistry {
-    pub const LEN: usize = 8 + 32 + (4 + 10 * 32) + 1;
+    pub const LEN: usize = 8 + 32 + (10 * 32) + 1 + 1;
 }
 
 #[account]
@@ -61,7 +62,8 @@ pub struct InitializeOracleRegistry<'info> {
 pub fn initialize_oracle_registry(ctx: Context<InitializeOracleRegistry>) -> Result<()> {
     let registry = &mut ctx.accounts.oracle_registry;
     registry.authority = ctx.accounts.authority.key();
-    registry.authorized_oracles = Vec::new();
+    registry.authorized_oracles = [Pubkey::default(); 10];
+    registry.oracle_count = 0;
     registry.bump = ctx.bumps.oracle_registry;
     
     msg!("Oracle registry initialized");
@@ -85,16 +87,22 @@ pub struct AddOracle<'info> {
 pub fn add_oracle(ctx: Context<AddOracle>, oracle_pubkey: Pubkey) -> Result<()> {
     let registry = &mut ctx.accounts.oracle_registry;
     
+    // Check if already exists
+    let count = registry.oracle_count as usize;
+    for i in 0..count {
+        require!(
+            registry.authorized_oracles[i] != oracle_pubkey,
+            ReputationError::OracleNotAuthorized
+        );
+    }
+    
     require!(
-        !registry.authorized_oracles.contains(&oracle_pubkey),
-        ReputationError::OracleNotAuthorized
-    );
-    require!(
-        registry.authorized_oracles.len() < 10,
+        count < 10,
         ReputationError::InvalidParameter
     );
     
-    registry.authorized_oracles.push(oracle_pubkey);
+    registry.authorized_oracles[count] = oracle_pubkey;
+    registry.oracle_count += 1;
     
     msg!("Oracle added: {}", oracle_pubkey);
     Ok(())
@@ -153,8 +161,15 @@ pub fn submit_attestation(
     let registry = &ctx.accounts.oracle_registry;
     
     // Verify oracle is authorized
+    let mut found = false;
+    for i in 0..registry.oracle_count as usize {
+        if registry.authorized_oracles[i] == oracle {
+            found = true;
+            break;
+        }
+    }
     require!(
-        registry.authorized_oracles.contains(&oracle),
+        found,
         ReputationError::OracleNotAuthorized
     );
     
@@ -220,11 +235,23 @@ pub fn claim_reputation(ctx: Context<ClaimReputation>) -> Result<()> {
 }
 
 /// Get attestation metadata URI (for off-chain verification)
-pub fn get_attestation_uri(metadata_hash: [u8; 32]) -> String {
-    // Convert hash to hex string
-    let hex_string = metadata_hash.iter()
-        .map(|b| format!("{:02x}", b))
-        .collect::<String>();
+/// Returns fixed-size array instead of String for Anchor compatibility
+pub fn get_attestation_uri(metadata_hash: [u8; 32]) -> [u8; 100] {
+    // Convert hash to hex string stored in fixed array
+    let mut result = [0u8; 100];
+    let prefix = b"https://api.agentreputation.io/attestations/";
+    result[..prefix.len()].copy_from_slice(prefix);
     
-    format!("https://api.agentreputation.io/attestations/{}", hex_string)
+    // Add hex representation of hash (64 chars for 32 bytes)
+    for (i, byte) in metadata_hash.iter().enumerate() {
+        let hex_chars = format!("{:02x}", byte);
+        let bytes = hex_chars.as_bytes();
+        let pos = prefix.len() + i * 2;
+        if pos + 1 < 100 {
+            result[pos] = bytes[0];
+            result[pos + 1] = bytes[1];
+        }
+    }
+    
+    result
 }

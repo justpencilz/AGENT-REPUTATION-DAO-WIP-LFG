@@ -217,14 +217,25 @@ pub struct PropagateTrust<'info> {
     pub config: Account<'info, ProtocolConfig>,
 }
 
+/// Vouch data for trust propagation (Anchor-friendly struct)
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy)]
+pub struct VouchData {
+    pub voucher: Pubkey,
+    pub reputation: u64,
+    pub weight: u64,
+}
+
 /// Calculate propagated reputation from trust network
 /// Uses PageRank-style algorithm: R_i = (1-alpha) * sum(T_ji * R_j) + alpha * E_i
 pub fn propagate_trust(
     ctx: Context<PropagateTrust>,
-    incoming_vouches: Vec<(Pubkey, u64, u64)>, // (voucher_pubkey, voucher_reputation, trust_weight)
+    incoming_vouches: [VouchData; 10], // Fixed array with max 10 vouches
+    vouch_count: u8, // Actual number of vouches used
 ) -> Result<()> {
     let profile = &mut ctx.accounts.agent_profile;
     let config = &ctx.accounts.config;
+    
+    require!(vouch_count <= 10, ReputationError::InvalidParameter);
     
     // Alpha parameter for stability (typically 0.15)
     let alpha: u64 = 1500; // 0.15 in basis points
@@ -232,10 +243,16 @@ pub fn propagate_trust(
     
     // Calculate trust flow from incoming vouches
     let mut trust_flow: u64 = 0;
-    let total_reputation: u64 = incoming_vouches.iter().map(|(_, rep, _)| rep).sum();
+    let mut total_reputation: u64 = 0;
+    
+    for i in 0..vouch_count as usize {
+        total_reputation = total_reputation.saturating_add(incoming_vouches[i].reputation);
+    }
     
     if total_reputation > 0 {
-        for (_, voucher_rep, weight) in incoming_vouches {
+        for i in 0..vouch_count as usize {
+            let voucher_rep = incoming_vouches[i].reputation;
+            let weight = incoming_vouches[i].weight;
             // Contribution = (voucher_rep / total_rep) * weight
             let contribution = voucher_rep
                 .saturating_mul(weight)
