@@ -31,8 +31,11 @@ pub fn initialize(ctx: Context<Initialize>, config: ProtocolConfig) -> Result<()
     config_account.min_reputation_for_vouching = config.min_reputation_for_vouching;
     config_account.decay_rate_per_day = config.decay_rate_per_day;
     config_account.vouch_lockup_period = config.vouch_lockup_period;
+    config_account.slash_threshold = 2000; // Default 20% slash
+    config_account.max_trust_multiplier = 30000; // Default 3x max multiplier
     config_account.bump = ctx.bumps.config;
     
-    msg!("Protocol initialized with decay rate: {} bps", config.decay_rate_per_day);
+    msg!("Protocol initialized with decay rate: {} bps, slash threshold: {} bps", 
+        config.decay_rate_per_day, config_account.slash_threshold);
     Ok(())
 }

@@ -34,4 +34,31 @@ pub enum ReputationError {
     
     #[msg("Math overflow")]
     MathOverflow,
+    
+    #[msg("Description too long")]
+    DescriptionTooLong,
+    
+    #[msg("Voting period has ended")]
+    VotingPeriodEnded,
+    
+    #[msg("Voting period still active")]
+    VotingPeriodActive,
+    
+    #[msg("Proposal already executed")]
+    ProposalAlreadyExecuted,
+    
+    #[msg("Quorum not reached")]
+    QuorumNotReached,
+    
+    #[msg("Proposal rejected")]
+    ProposalRejected,
+    
+    #[msg("Invalid parameter value")]
+    InvalidParameter,
+    
+    #[msg("Oracle not authorized")]
+    OracleNotAuthorized,
+    
+    #[msg("Invalid proof")]
+    InvalidProof,
 }

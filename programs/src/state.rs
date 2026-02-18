@@ -8,11 +8,13 @@ pub struct ProtocolConfig {
     pub min_reputation_for_vouching: u64,
     pub decay_rate_per_day: u64, // basis points (10000 = 100%)
     pub vouch_lockup_period: i64, // seconds
+    pub slash_threshold: u64, // basis points for slashing
+    pub max_trust_multiplier: u64, // basis points (30000 = 3x)
     pub bump: u8,
 }
 
 impl ProtocolConfig {
-    pub const LEN: usize = 8 + 32 + 32 + 8 + 8 + 8 + 1;
+    pub const LEN: usize = 8 + 32 + 32 + 8 + 8 + 8 + 8 + 8 + 1;
 }
 
 /// Agent profile - PDA seeded by [agent, agent_pubkey]
