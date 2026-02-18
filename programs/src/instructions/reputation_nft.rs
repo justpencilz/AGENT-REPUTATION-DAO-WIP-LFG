@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::{self, Token, TokenAccount, Mint, MintTo};
+use anchor_spl::token::{self, Token, TokenAccount, Mint, MintTo, FreezeAccount};
 use crate::state::AgentProfile;
 
 /// Soulbound Reputation NFT
@@ -12,12 +12,12 @@ pub struct ReputationNFT {
     pub level: ReputationLevel,
     pub score_at_mint: u64,
     pub minted_at: i64,
-    pub metadata_uri: String, // IPFS or Arweave URI
+    pub metadata_uri: [u8; 100], // Fixed-size URI
     pub bump: u8,
 }
 
 impl ReputationNFT {
-    pub const LEN: usize = 8 + 32 + 1 + 8 + 8 + (4 + 100) + 1;
+    pub const LEN: usize = 8 + 32 + 1 + 8 + 8 + 100 + 1;
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]
@@ -102,6 +102,8 @@ pub fn mint_reputation_nft(
     ctx: Context<MintReputationNFT>,
     metadata_uri: String,
 ) -> Result<()> {
+    require!(metadata_uri.len() <= 100, crate::errors::ReputationError::DescriptionTooLong);
+    
     let agent = ctx.accounts.agent.key();
     let agent_profile = &ctx.accounts.agent_profile;
     let clock = Clock::get()?;
@@ -109,13 +111,18 @@ pub fn mint_reputation_nft(
     // Determine level based on current reputation
     let level = ReputationLevel::from_score(agent_profile.reputation_score);
     
+    // Convert String to fixed-size array
+    let mut uri_bytes = [0u8; 100];
+    let uri_slice = metadata_uri.as_bytes();
+    uri_bytes[..uri_slice.len()].copy_from_slice(uri_slice);
+    
     // Create NFT account
     let nft = &mut ctx.accounts.reputation_nft;
     nft.agent = agent;
     nft.level = level.clone();
     nft.score_at_mint = agent_profile.reputation_score;
     nft.minted_at = clock.unix_timestamp;
-    nft.metadata_uri = metadata_uri;
+    nft.metadata_uri = uri_bytes;
     nft.bump = ctx.bumps.reputation_nft;
     
     // Mint the NFT (soulbound - non-transferable)

@@ -10,7 +10,7 @@ pub struct GovernanceProposal {
     pub proposer: Pubkey,
     pub proposal_type: ProposalType,
     pub new_value: u64,
-    pub description: String, // max 200 chars
+    pub description: [u8; 200], // Fixed-size description
     pub votes_for: u64,
     pub votes_against: u64,
     pub voting_ends_at: i64,
@@ -19,7 +19,7 @@ pub struct GovernanceProposal {
 }
 
 impl GovernanceProposal {
-    pub const LEN: usize = 8 + 32 + 1 + 8 + (4 + 200) + 8 + 8 + 8 + 1 + 1;
+    pub const LEN: usize = 8 + 32 + 1 + 8 + 200 + 8 + 8 + 8 + 1 + 1;
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]
@@ -83,10 +83,15 @@ pub fn create_proposal(
     let clock = Clock::get()?;
     let proposal = &mut ctx.accounts.proposal;
     
+    // Convert String to fixed-size byte array
+    let mut desc_bytes = [0u8; 200];
+    let bytes = description.as_bytes();
+    desc_bytes[..bytes.len()].copy_from_slice(bytes);
+    
     proposal.proposer = ctx.accounts.proposer.key();
     proposal.proposal_type = proposal_type;
     proposal.new_value = new_value;
-    proposal.description = description;
+    proposal.description = desc_bytes;
     proposal.votes_for = 0;
     proposal.votes_against = 0;
     proposal.voting_ends_at = clock.unix_timestamp + 86400 * 3; // 3 day voting period

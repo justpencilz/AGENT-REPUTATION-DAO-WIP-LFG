@@ -221,8 +221,10 @@ pub fn claim_reputation(ctx: Context<ClaimReputation>) -> Result<()> {
 
 /// Get attestation metadata URI (for off-chain verification)
 pub fn get_attestation_uri(metadata_hash: [u8; 32]) -> String {
-    format!("https://api.agentreputation.io/attestations/{}", 
-        bs58::encode(metadata_hash).into_string())
+    // Convert hash to hex string
+    let hex_string = metadata_hash.iter()
+        .map(|b| format!("{:02x}", b))
+        .collect::<String>();
+    
+    format!("https://api.agentreputation.io/attestations/{}", hex_string)
 }
-
-use bs58;
